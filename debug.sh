@@ -2,6 +2,16 @@
 
 service=$1
 
+if [ -z $service ]; then
+  echo "parameter 1 must be service name"
+  echo "optional parameter 2 is node working directory"
+  echo "optional parameter 3 is entry point for node"
+  exit 1
+fi
+
+workdir=${2:-/usr/src/app}
+nodeindex=${3:-/src/index}
+
 docker-compose kill $service
 docker-compose rm -f $service
 
