@@ -20,7 +20,7 @@ cat << EOF > docker-compose.debug.yml
 version: '3'
 services:
   $service:
-    command: sh -c "yarn prestart ; node --inspect-brk=0.0.0.0:9229 /usr/src/app/src/index"
+    command: sh -c "node --inspect-brk=0.0.0.0:9229 /usr/src/app/src/index"
     ports:
       - "$port:9229"
 EOF
