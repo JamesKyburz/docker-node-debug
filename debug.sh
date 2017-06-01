@@ -11,6 +11,7 @@ fi
 
 workdir=${2:-/usr/src/app}
 nodeindex=${3:-/src/index}
+port=${INSPECT_PORT:-9228}
 
 docker-compose kill $service
 docker-compose rm -f $service
@@ -21,7 +22,7 @@ services:
   $service:
     command: sh -c "yarn prestart ; node --inspect-brk=0.0.0.0:9229 /usr/src/app/src/index"
     ports:
-      - "9229:9229"
+      - "$port:9229"
 EOF
 
 docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.debug.yml up -d --build $service
