@@ -11,7 +11,7 @@ fi
 
 workdir=${2:-/usr/src/app}
 nodeindex=${3:-/src/index}
-port=${INSPECT_PORT:-9228}
+port=${INSPECT_PORT:-9229}
 
 docker-compose kill $service
 docker-compose rm -f $service
@@ -20,7 +20,7 @@ cat << EOF > docker-compose.debug.yml
 version: '3'
 services:
   $service:
-    command: sh -c "node --inspect-brk=0.0.0.0:9229 /usr/src/app/src/index"
+    command: sh -c "node --inspect-brk=0.0.0.0:9229 $workdir$nodeindex"
     ports:
       - "$port:9229"
 EOF
