@@ -50,6 +50,5 @@ done
 rm -rf docker-compose.debug.yml
 echo ""
 echo "restarting $service without debug"
-docker-compose kill $service
-docker-compose rm -f $service
+removeservice
 docker-compose up -d --build $service
