@@ -13,8 +13,16 @@ workdir=${2:-/usr/src/app}
 nodeindex=${3:-/src/index}
 port=${INSPECT_PORT:-9229}
 
-docker-compose kill $service
-docker-compose rm -f $service
+function debugservice {
+  docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.debug.yml up -d --build $service
+}
+
+function removeservice {
+  docker-compose kill $service
+  docker-compose rm -f $service
+}
+
+removeservice
 
 cat << EOF > docker-compose.debug.yml
 version: '3'
@@ -25,12 +33,20 @@ services:
       - "$port:9229"
 EOF
 
-docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.debug.yml up -d --build $service
+debugservice
 
 echo "open chrome with url chrome://inspect, then select inspect for $service"
 
-echo "press any key to stop debugging"
-read -n 1
+while true; do
+  echo "press any key to stop debugging press (r to restart debug)"
+  read -n 1 key
+  if [ "$key" == "r" ]; then
+    removeservice
+    debugservice
+  else
+    break
+  fi
+done
 rm -rf docker-compose.debug.yml
 echo ""
 echo "restarting $service without debug"
