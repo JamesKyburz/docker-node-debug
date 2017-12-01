@@ -28,14 +28,17 @@ fi
 workdir=${2:-/usr/src/app}
 nodeindex=${3:-/src/index}
 port=${INSPECT_PORT:-9229}
+ymlfiles=${DOCKER_COMPOSE_YAML_FILES:--f docker-compose.yml -f docker-compose.override.yml}
+
+compose="docker-compose $ymlfiles"
 
 function debugservice {
-  docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.debug.yml up -d --build $service
+  $compose -f docker-compose.debug.yml up -d --build $service
 }
 
 function removeservice {
-  docker-compose kill $service
-  docker-compose rm -f $service
+  $compose kill $service
+  $compose rm -f $service
 }
 
 removeservice
@@ -46,6 +49,8 @@ services:
   $service:
     entrypoint: sh -c "node --inspect-brk=0.0.0.0:9229 $workdir$nodeindex"
     command: []
+    environment:
+      - RABBITMQ_PREFETCH=1
     ports:
       - "$port:9229"
 EOF
@@ -68,4 +73,4 @@ rm -rf docker-compose.debug.yml
 echo ""
 log_success "restarting $service without debug"
 removeservice
-docker-compose up -d --build $service
+$compose up -d --build $service
